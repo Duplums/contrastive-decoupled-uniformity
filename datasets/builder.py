@@ -119,7 +119,7 @@ def prepare_dataset(args) -> Dataset:
     if args.db in ["cifar10", "cifar100", "cub200", "utzappos"]:
         extra_kwargs["download"] = True
 
-    if args.weaklabel:
+    if args.weaklabels:
         prior_path = dataset2cls[args.db].prior_path
         dataset_cls = dataset_with_prior(dataset2cls[args.db], prior_path)
     else:
