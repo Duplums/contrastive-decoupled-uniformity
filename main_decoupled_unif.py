@@ -261,7 +261,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         # compute output and loss
         b_size, n_views = images.shape[:2]
         z = model(images.view(b_size * n_views, *images.shape[2:]))
-        loss = criterion(z.view(b_size, n_views, -1))
+        loss = criterion(z.view(b_size, n_views, -1), prior)
 
         losses.update(loss.item(), b_size)
         alignment.update(criterion.metrics.get("align"), b_size)

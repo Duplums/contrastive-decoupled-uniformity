@@ -144,7 +144,7 @@ is trained on these extracted features. Importantly, we do **not** apply data au
 For ImageNet100, we apply the standard recipe consisting in SGD training of a linear layer with a frozen pre-trained model.
 Data augmentation is applied during training of the linear layer.
 
-Use the following script to run linear evaluation on one of the previous dataset in a multi-gpu machine:
+Use the following script to run linear evaluation on one of the previous dataset on a multi-gpu machine:
 
 ```bash
 python src/main_lincls.py --root [YOUR DATASET FOLDER] --save_dir [YOUR CHECKPOINT PATH] \
@@ -152,7 +152,7 @@ python src/main_lincls.py --root [YOUR DATASET FOLDER] --save_dir [YOUR CHECKPOI
                           --pretrained [YOUR CHECKPOINT PATH]/checkpoint_0399.pth.tar 
 ```
 
-By default, the above uses batch size 512 and SGD optimizer with a `torch.optim.lr_scheduler.ReduceLROnPlateau` 
+By default, the above command uses batch size 512 and SGD optimizer with a `torch.optim.lr_scheduler.ReduceLROnPlateau` 
 learning rate scheduler for ImageNet. 
 
 *Note:* linear evaluation on CheXpert requires to set `--chexpert_label` with the corresponding CheXpert class, seen
