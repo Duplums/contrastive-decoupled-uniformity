@@ -128,9 +128,9 @@ def main_worker(gpu, ngpus_per_node, args):
                                 world_size=args.world_size, rank=args.rank)
         torch.distributed.barrier()
     # create model
-    print("=> creating model '{}'".format(args.arch))
+    print("=> creating model '{}'".format(args.network))
     model = DecoupledUniformity(
-        models.__dict__[args.arch],
+        models.__dict__[args.network],
         first_conv=(args.db in ["imagenet100", "chexpert", "cub200"]))
 
     # infer learning rate before changing batch size
@@ -234,7 +234,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                                         and args.rank % ngpus_per_node == 0):
                 save_checkpoint({
                     'epoch': epoch + 1,
-                    'arch': args.arch,
+                    'arch': args.network,
                     'state_dict': model.state_dict(),
                     'optimizer' : optimizer.state_dict(),
                 }, is_best=False, filename=os.path.join(args.save_dir, 'checkpoint_{:04d}.pth.tar'.format(epoch)))

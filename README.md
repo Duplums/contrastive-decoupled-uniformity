@@ -148,7 +148,7 @@ Use the following script to run linear evaluation on one of the previous dataset
 
 ```bash
 python src/main_lincls.py --root [YOUR DATASET FOLDER] --save_dir [YOUR CHECKPOINT PATH] \
-                          --db [YOUR DATASET] \
+                          --db [YOUR DATASET] --network [YOUR NETWORK] \
                           --pretrained [YOUR CHECKPOINT PATH]/checkpoint_0399.pth.tar 
 ```
 

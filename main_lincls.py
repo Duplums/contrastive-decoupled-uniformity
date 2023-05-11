@@ -35,7 +35,7 @@ parser.add_argument("--save_dir", type=str)
 parser.add_argument("--db", default="imagenet100", choices=datasets)
 parser.add_argument("--chexpert_label", choices=CheXpert.PATHOLOGIES, type=str,
                     help="CheXpert class label to discriminate. Ignored if db != chexpert")
-parser.add_argument('-a', '--arch', metavar='ARCH', default='resnet50',
+parser.add_argument('-n', '--network', default='resnet50',
                     choices=model_names,
                     help='model architecture: ' +
                          ' | '.join(model_names) +
@@ -136,8 +136,8 @@ def main_worker(gpu, ngpus_per_node, args):
                                 world_size=args.world_size, rank=args.rank)
         torch.distributed.barrier()
     # create model
-    print("=> creating model '{}'".format(args.arch))
-    model = models.__dict__[args.arch]()
+    print("=> creating model '{}'".format(args.network))
+    model = models.__dict__[args.network]()
 
     # freeze all layers but the last fc
     for name, param in model.named_parameters():
@@ -197,7 +197,7 @@ def main_worker(gpu, ngpus_per_node, args):
         model = model.cuda(args.gpu)
     else:
         # DataParallel will divide and allocate batch_size to all available GPUs
-        if args.arch.startswith('alexnet') or args.arch.startswith('vgg'):
+        if args.network.startswith('alexnet') or args.network.startswith('vgg'):
             model.features = torch.nn.DataParallel(model.features)
             model.cuda()
         else:
@@ -281,7 +281,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                                         and args.rank % ngpus_per_node == 0):
                 save_checkpoint({
                     'epoch': epoch + 1,
-                    'arch': args.arch,
+                    'arch': args.network,
                     'state_dict': model.state_dict(),
                     'best_acc1': best_acc1,
                     'optimizer' : optimizer.state_dict()},
@@ -304,7 +304,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                                     and args.rank % ngpus_per_node == 0):
             save_checkpoint({
                 'epoch': args.epochs,
-                'arch': args.arch,
+                'arch': args.network,
                 'state_dict': model.state_dict(),
                 'best_acc1': best_acc1,
                 'optimizer' : optimizer.state_dict()},
