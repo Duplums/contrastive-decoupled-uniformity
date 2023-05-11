@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import numpy as np
-from util import RBFKernel, CosineKernel
+from src.util import RBFKernel, CosineKernel
 import torch.functional as func
 
 class DecoupledUniformity(nn.Module):
