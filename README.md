@@ -39,7 +39,7 @@ To reproduce our results on CIFAR10/CIFAR100, try the following command (replace
 
 ```bash
 python src/main_decoupled_unif.py --root [YOUR CIFAR10/100 DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                                  --batch_size 256 --initial_lr 0.3 \
+                                  --batch_size 256 --lr 0.3 \
                                   --optimizer sgd --network resnet18 --db cifar10 \
                                   --multiprocessing-distributed
 ```
@@ -53,7 +53,7 @@ For bigger-scale training (e.g. ImageNet100) using ResNet50 backbone, try the fo
 
 ```bash
 python src/main_decoupled_unif.py --root [YOUR IMAGENET DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                                  --batch_size 256 --initial_lr 0.3 \
+                                  --batch_size 256 --lr 0.3 \
                                   --optimizer lars --wd 1e-6 --network resnet50 \
                                   --db imagenet100 --multiprocessing-distributed
 ```
@@ -91,7 +91,7 @@ After having generated BigBiGAN features, use the following script to pre-train 
 
 ```bash
 python main_decoupled_unif.py --root [YOUR IMAGENET DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                              --batch_size 256 --initial_lr 0.3 \
+                              --batch_size 256 --lr 0.3 \
                               --optimizer lars --wd 1e-6 --network resnet50 \
                               --db imagenet100 --kernel rbf --sigma 100 --weaklabels \
                               --multiprocessing-distributed
@@ -104,7 +104,7 @@ The model can be pre-trained on CUB200 with:
 
 ```bash
 python src/main_decoupled_unif.py --root [YOUR CUB200 DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                                  --batch_size 256 --initial_lr 0.3 \
+                                  --batch_size 256 --lr 0.3 \
                                   --optimizer sgd --network resnet18 --db cub200 \
                                   --kernel rbf --sigma 20 --weaklabels \
                                   --multiprocessing-distributed
@@ -118,7 +118,7 @@ It comes with seven discrete attributes binarized into 126 binary attributes.
 
 ```bash
 python src/main_decoupled_unif.py --root [YOUR UTZAPPOS DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                                  --batch_size 256 --initial_lr 0.3 \
+                                  --batch_size 256 --lr 0.3 \
                                   --optimizer sgd --network resnet18 --db utzappos \
                                   --kernel rbf --sigma 100 --weaklabels \
                                   --multiprocessing-distributed
@@ -131,7 +131,7 @@ To extract weak attributes using GloRIA, please read the above section. Then, yo
 
 ```bash
 python src/main_decoupled_unif.py --root [YOUR CHEXPERT DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                                  --batch_size 256 --initial_lr 0.3 \
+                                  --batch_size 256 --lr 0.3 \
                                   --optimizer sgd --network resnet18 --db chexpert \
                                   --kernel rbf --sigma 10 --weaklabels
 ```

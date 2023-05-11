@@ -27,8 +27,7 @@ model_names = sorted(name for name in models.__dict__
 datasets = ["imagenet100", "cifar10", "cifar100", "utzappos", "cub200", "chexpert"]
 
 parser = argparse.ArgumentParser(description='PyTorch Decoupled Uniformity Pretraining')
-parser.add_argument('root', metavar='DIR',
-                    help='path to dataset')
+parser.add_argument('--root', help='path to dataset')
 parser.add_argument('--save_dir', type=str, help="path to save model")
 parser.add_argument('-n', '--network', default='resnet50',
                     choices=model_names,
@@ -53,9 +52,8 @@ parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
                     help='manual epoch number (useful on restarts)')
 parser.add_argument("--save_freq", default=100, type=int,
                     help="checkpoint saving frequency")
-parser.add_argument('-b', '--batch-size', default=256, type=int,
-                    metavar='N', dest="batch_size",
-                    help='mini-batch size (default: 256), this is the total '
+parser.add_argument('-b', '--batch_size', default=256, type=int,
+                    metavar='N', help='mini-batch size (default: 256), this is the total '
                          'batch size of all GPUs on the current node when '
                          'using Data Parallel.')
 parser.add_argument('--optimizer', default="sgd", choices=["sgd", "lars"])
