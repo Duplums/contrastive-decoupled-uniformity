@@ -20,8 +20,8 @@ class NTransform:
         self.base_transform = base_transform
         self.n_views = n_views
 
-    def __call__(self, x: Image) -> List[torch.Tensor]:
-        return [self.base_transform(x) for _ in range(self.n_views)]
+    def __call__(self, x: Image) -> torch.Tensor:
+        return torch.stack([self.base_transform(x) for _ in range(self.n_views)])
 
 class ColorDistortion:
     def __init__(self, s: float=1.0):
