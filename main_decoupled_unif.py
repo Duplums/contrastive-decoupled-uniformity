@@ -227,7 +227,7 @@ def main_worker(gpu, ngpus_per_node, args):
         train(train_loader, model, criterion, optimizer, epoch, args)
 
         # adjust learning rate
-        scheduler.step(epoch)
+        scheduler.step()
 
         if epoch == args.epochs - 1 or epoch % args.save_freq == 0:
             if not args.multiprocessing_distributed or (args.multiprocessing_distributed

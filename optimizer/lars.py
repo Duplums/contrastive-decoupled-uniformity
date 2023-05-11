@@ -133,7 +133,7 @@ class LARS(Optimizer):
                     else:
                         next_v = param_state["momentum_buffer"]
 
-                    next_v.mul_(momentum).add_(scaled_lr, grad)
+                    next_v.mul_(momentum).add_(grad, alpha=scaled_lr)
                     if self.use_nesterov:
                         update = (self.momentum * next_v) + (scaled_lr * grad)
                     else:
