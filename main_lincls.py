@@ -40,8 +40,8 @@ parser.add_argument('-n', '--network', default='resnet50',
                     help='model architecture: ' +
                          ' | '.join(model_names) +
                          ' (default: resnet50)')
-parser.add_argument('-j', '--workers', default=32, type=int, metavar='N',
-                    help='number of data loading workers (default: 32)')
+parser.add_argument('-j', '--workers', default=8, type=int, metavar='N',
+                    help='number of data loading workers (default: 8)')
 parser.add_argument('--epochs', default=150, type=int, metavar='N',
                     help='number of total epochs to run')
 parser.add_argument('--start-epoch', default=0, type=int, metavar='N',
@@ -301,9 +301,12 @@ def main_worker(gpu, ngpus_per_node, args):
                                     scoring="balanced_accuracy",
                                     batch_size=args.batch_size,
                                     num_workers=args.workers)
-        acc1 = validate_linear(X_test, y_test, linear_model)
+        acc1, acc5 = accuracy(torch.tensor(linear_model.predict_proba(X_test)),
+                               torch.tensor(y_test), topk=(1, 5))
         is_best = acc1 > best_acc1
         best_acc1 = max(acc1, best_acc1)
+        print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
+              .format(top1=acc1, top5=acc5))
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % ngpus_per_node == 0):
             save_checkpoint({
@@ -311,7 +314,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 'arch': args.network,
                 'state_dict': model.state_dict(),
                 'best_acc1': best_acc1,
-                'optimizer' : optimizer.state_dict()},
+                'optimizer': optimizer.state_dict()},
                 is_best,
                 filename=os.path.join(args.save_dir, 'checkpoint.pth.tar'))
 

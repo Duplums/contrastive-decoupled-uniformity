@@ -31,10 +31,6 @@ def train_linear(X_train, y_train, cv=3,
     model.fit(X_train, y_train)
     return model
 
-def validate_linear(X_test, y_test, model):
-    return accuracy_score(y_test, model.predict(X_test))
-
-
 class LinearEstimator(ABC, BaseEstimator):
     def __init__(self, lr=0.1, batch_size=128, epochs=300, momentum=0.9,
                  weight_decay=0.0, val_fraction=0.1, tol=1e-4):
