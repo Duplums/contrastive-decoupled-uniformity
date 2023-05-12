@@ -2,9 +2,9 @@ import argparse
 import builtins
 import math
 import os
-import random
 import shutil
 import time
+import re
 import warnings
 import numpy as np
 
@@ -153,15 +153,15 @@ def main_worker(gpu, ngpus_per_node, args):
             print("=> loading checkpoint '{}'".format(args.pretrained))
             checkpoint = torch.load(args.pretrained, map_location="cpu")
 
-            # rename moco pre-trained keys
+            # rename pre-trained keys
             state_dict = checkpoint['state_dict']
             for k in list(state_dict.keys()):
                 # retain only encoder up to before the embedding layer
-                if k.startswith('module.encoder') and not k.startswith('module.encoder.fc'):
-                    # remove prefix
-                    state_dict[k[len("module.encoder."):]] = state_dict[k]
-                # delete renamed or unused k
-                del state_dict[k]
+                new_k = re.sub(r"(module.encoder.|encoder.)", "", k)
+                if not new_k.startswith("fc"):
+                    state_dict[new_k] = state_dict[k]
+                    # delete renamed or unused k
+                    del state_dict[k]
 
             args.start_epoch = 0
             msg = model.load_state_dict(state_dict, strict=False)
