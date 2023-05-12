@@ -1,6 +1,6 @@
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset
-from builder import NTransform, ColorDistortion
+from datasets.builder import NTransform, ColorDistortion
 # custom PyTorch implementation of public datasets
 from datasets.imagenet100 import ImageNet100
 from datasets.chexpert import CheXpert

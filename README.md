@@ -35,7 +35,7 @@ following scripts. It allows multi-GPU DistributedDataParallel training on one o
 
 ### CIFAR10/CIFAR100
 
-To reproduce our results on CIFAR10/CIFAR100, try the following command (replace by `--db cifar100` for CIFAR100): 
+To reproduce our results on CIFAR10/CIFAR100 on a single-gpu machine, try the following command (replace by `--db cifar100` for CIFAR100): 
 
 ```bash
 python src/main_decoupled_unif.py --root [YOUR CIFAR10/100 DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
@@ -49,7 +49,7 @@ in our paper.
 
 ### ImageNet100
 
-For bigger-scale training (e.g. ImageNet100) using ResNet50 backbone, try the following command:
+For bigger-scale training (e.g. ImageNet100) using ResNet50 backbone, 4-gpu machine, try the following command:
 
 ```bash
 python src/main_decoupled_unif.py --root [YOUR IMAGENET DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
