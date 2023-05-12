@@ -29,7 +29,7 @@ model_names = sorted(name for name in models.__dict__
 datasets = ["imagenet100", "cifar10", "cifar100", "utzappos", "cub200", "chexpert"]
 
 parser = argparse.ArgumentParser(description='PyTorch Linear Evaluation')
-parser.add_argument('root', metavar='DIR',
+parser.add_argument('--root', metavar='DIR',
                     help='path to dataset')
 parser.add_argument("--save_dir", type=str)
 parser.add_argument("--db", default="imagenet100", choices=datasets)
