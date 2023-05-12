@@ -21,7 +21,7 @@ from torch.optim.lr_scheduler import ReduceLROnPlateau
 import torchvision.models as models
 from datasets.classification_builder import prepare_datasets
 from datasets.chexpert import CheXpert
-from src.linear_model import encode_dataset, train_linear, validate_linear
+from src.linear_model import encode_dataset, train_linear
 
 model_names = sorted(name for name in models.__dict__
                      if name.islower() and not name.startswith("__")
@@ -302,7 +302,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                     batch_size=args.batch_size,
                                     num_workers=args.workers)
         acc1, acc5 = accuracy(torch.tensor(linear_model.predict_proba(X_test)),
-                               torch.tensor(y_test), topk=(1, 5))
+                                torch.tensor(y_test), topk=(1, 5))
         is_best = acc1 > best_acc1
         best_acc1 = max(acc1, best_acc1)
         print(' * Acc@1 {top1.avg:.3f} Acc@5 {top5.avg:.3f}'
