@@ -41,7 +41,7 @@ To reproduce our results on CIFAR10/CIFAR100, try the following command (replace
 python src/main_decoupled_unif.py --root [YOUR CIFAR10/100 DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
                                   --batch_size 256 --lr 0.3 \
                                   --optimizer sgd --network resnet18 --db cifar10 \
-                                  --multiprocessing-distributed
+                                  --gpu 0
 ```
 
 This script will perform pre-training for 400 epochs with ResNet18 backbone and all default hyper-parameters described

@@ -5,6 +5,7 @@ import argparse
 import builtins
 import os
 import shutil
+import time
 import torch
 import torch.nn.parallel
 import torch.backends.cudnn as cudnn
@@ -162,7 +163,7 @@ def main_worker(gpu, ngpus_per_node, args):
         torch.cuda.set_device(args.gpu)
         model = model.cuda(args.gpu)
         # comment out the following line for debugging
-        raise NotImplementedError("Only DistributedDataParallel is supported.")
+        # raise NotImplementedError("Only DistributedDataParallel is supported.")
     else:
         # AllGather implementation (batch shuffle, queue update, etc.) in
         # this code only supports DistributedDataParallel.
@@ -251,6 +252,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
     # switch to train mode
     model.train()
+    n_batches = len(train_loader)
+    end = time.time()
 
     for i, (images, prior) in enumerate(train_loader):
         if args.gpu is not None:
@@ -263,6 +266,8 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
         losses.update(loss.item(), b_size)
         alignment.update(criterion.metrics.get("align"), b_size)
+        batch_time.update((time.time() - end)*n_batches)
+
         # compute gradient and do SGD step
         optimizer.zero_grad()
         loss.backward()
