@@ -140,8 +140,8 @@ def main_worker(gpu, ngpus_per_node, args):
     model = models.__dict__[args.network]()
     # replace first conv for small-scale images
     if args.db in ["cifar10", "cifar100", "utzappos"]:
-        model.encoder.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
-        model.encoder.maxpool = nn.Identity()
+        model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
+        model.maxpool = nn.Identity()
 
     # freeze all layers but the last fc
     for name, param in model.named_parameters():
