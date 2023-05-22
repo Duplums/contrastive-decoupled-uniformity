@@ -111,7 +111,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # suppress printing if not master
     if args.multiprocessing_distributed and args.gpu != 0:
-        def print_pass(*args):
+        def print_pass(*args, **kwargs):
             pass
         builtins.print = print_pass
 
@@ -210,7 +210,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # Data loading code
     train_dataset = prepare_dataset(args)
-
+    print(train_dataset, flush=True)
     if args.distributed:
         train_sampler = torch.utils.data.distributed.DistributedSampler(train_dataset)
     else:
