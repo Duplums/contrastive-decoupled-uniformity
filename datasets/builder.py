@@ -80,7 +80,7 @@ def dataset_with_prior(DatasetClass: Type[Dataset], prior_path: str) -> Type[Dat
     """
     class DatasetWithPrior(DatasetClass):
         def __init__(self, *args, **kwargs):
-            super.__init__(*args, **kwargs)
+            super().__init__(*args, **kwargs)
             if not os.path.isfile(prior_path):
                 raise FileNotFoundError("Check %s"%prior_path)
             try:
