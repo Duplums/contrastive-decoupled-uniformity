@@ -305,8 +305,8 @@ def main_worker(gpu, ngpus_per_node, args):
                                 torch.tensor(y_test), topk=(1, 5))
         is_best = acc1 > best_acc1
         best_acc1 = max(acc1, best_acc1)
-        print(' * Acc@1 {top1:.3f} Acc@5 {top5:.3f}'
-              .format(top1=acc1, top5=acc5))
+        print(acc1, acc5, flush=True)
+        print(' * Acc@1 {top1:.3f} Acc@5 {top5:.3f}'.format(top1=acc1[0], top5=acc5[0]))
         if not args.multiprocessing_distributed or (args.multiprocessing_distributed
                                                     and args.rank % ngpus_per_node == 0):
             save_checkpoint({
