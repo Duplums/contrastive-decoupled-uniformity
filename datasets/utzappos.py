@@ -19,7 +19,7 @@ class UTZappos(ImageFolder):
     url_data = 'https://vision.cs.utexas.edu/projects/finegrained/utzap50k/ut-zap50k-data.zip'
     url_images = 'https://vision.cs.utexas.edu/projects/finegrained/utzap50k/ut-zap50k-images.zip'
     filenames = dict(data='ut-zap50k-data.zip', images='ut-zap50k-images.zip')
-    prior_path = os.path.join(Path(__file__).parent.resolve(), "data", "utzappos", "utzappos_prior.npz")
+    prior_path = os.path.join(Path(__file__).parent.parent.resolve(), "data", "utzappos", "utzappos_prior.npz")
 
     _classes = ['Ankle', 'Athletic', 'Boat Shoes', 'Boot', 'Clogs and Mules',
                 'Crib Shoes', 'Firstwalker', 'Flat', 'Flats', 'Heel', 'Heels',

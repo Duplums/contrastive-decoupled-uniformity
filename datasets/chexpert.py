@@ -26,7 +26,7 @@ class CheXpert(Dataset):
     PATHOLOGIES = ["Enlarged Cardiomediastinum", "Cardiomegaly", "Lung Opacity", "Lung Lesion",
                    "Edema", "Consolidation", "Pneumonia", "Atelectasis", "Pneumothorax", "Pleural Effusion",
                    "Pleural Other", "Fracture", "Support Devices"]
-    prior_path = os.path.join(Path(__file__).parent.resolve(), "data", "chexpert", "chexpert_prior.npz")
+    prior_path = os.path.join(Path(__file__).parent.parent.resolve(), "data", "chexpert", "chexpert_prior.npz")
 
     def __init__(self, root: str, train: bool=True,
                  views: [str, List[str]]="*", labels: str="all",

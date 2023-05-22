@@ -8,7 +8,7 @@ class ImageNet100(ImageNet):
         100-classes subset of ImageNet introduced in [1]
         [1] Contrastive Multiview Coding, Tian, Krishnan, Isola, ECCV 2020
     """
-    prior_path = os.path.join(Path(__file__).parent.resolve(), "data", "imagenet100", "imagenet100_prior.npz")
+    prior_path = os.path.join(Path(__file__).parent.parent.resolve(), "data", "imagenet100", "imagenet100_prior.npz")
 
     def _extract_classes(self, all_classes=None):
         """

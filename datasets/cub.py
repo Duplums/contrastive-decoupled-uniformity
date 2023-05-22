@@ -18,7 +18,7 @@ class CUB(ImageFolder):
     url = 'http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz'
     filename = 'CUB_200_2011.tgz'
     tgz_md5 = '97eceeb196236b17998738112f37df78'
-    prior_path = os.path.join(Path(__file__).parent.resolve(), "data", "cub", "cub_prior.npz")
+    prior_path = os.path.join(Path(__file__).parent.parent.resolve(), "data", "cub", "cub_prior.npz")
 
     def __init__(self, root, transform=None, target_transform=None,
                  split="train", download=True, **kwargs):
