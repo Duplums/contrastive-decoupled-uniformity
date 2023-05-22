@@ -70,6 +70,7 @@ def build_transform_pipeline(args):
     return tf
 
 def dataset_with_prior(DatasetClass: Type[Dataset], prior_path: str) -> Type[Dataset]:
+    global DatasetWithPrior
     """ Factory dataset that returns (sample, prior) instead of
         (sample, label) with target class `label`.
     Args:
