@@ -38,10 +38,10 @@ following scripts. It allows multi-GPU DistributedDataParallel training on one o
 To reproduce our results on CIFAR10/CIFAR100 on a single-gpu machine, try the following command (replace by `--db cifar100` for CIFAR100): 
 
 ```bash
-python src/main_decoupled_unif.py --root [YOUR CIFAR10/100 DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                                  --batch_size 256 --lr 0.3 \
-                                  --optimizer sgd --network resnet18 --db cifar10 \
-                                  --gpu 0
+python main_decoupled_unif.py --root [YOUR CIFAR10/100 DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
+                              --batch_size 256 --lr 0.3 \
+                              --optimizer sgd --network resnet18 --db cifar10 \
+                              --gpu 0
 ```
 
 This script will perform pre-training for 400 epochs with ResNet18 backbone and all default hyper-parameters described
@@ -52,10 +52,10 @@ in our paper.
 For bigger-scale training (e.g. ImageNet100) using ResNet50 backbone, 4-gpu machine, try the following command:
 
 ```bash
-python src/main_decoupled_unif.py --root [YOUR IMAGENET DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                                  --batch_size 256 --lr 0.3 \
-                                  --optimizer lars --wd 1e-6 --network resnet50 \
-                                  --db imagenet100 --multiprocessing-distributed
+python main_decoupled_unif.py --root [YOUR IMAGENET DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
+                              --batch_size 256 --lr 0.3 \
+                              --optimizer lars --wd 1e-6 --network resnet50 \
+                              --db imagenet100 --multiprocessing-distributed
 ```
 
 
@@ -103,11 +103,11 @@ python main_decoupled_unif.py --root [YOUR IMAGENET DATA FOLDER] --save_dir [YOU
 The model can be pre-trained on CUB200 with:
 
 ```bash
-python src/main_decoupled_unif.py --root [YOUR CUB200 DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                                  --batch_size 256 --lr 0.3 \
-                                  --optimizer sgd --network resnet18 --db cub200 \
-                                  --kernel rbf --sigma 20 --weaklabels \
-                                  --multiprocessing-distributed
+python main_decoupled_unif.py --root [YOUR CUB200 DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
+                              --batch_size 256 --lr 0.3 --epochs 1000 \
+                              --optimizer sgd --network resnet18 --db cub200 \
+                              --kernel rbf --sigma 20 --weaklabels \
+                              --multiprocessing-distributed
 ```
 
 #### UTZappos
@@ -117,11 +117,11 @@ python src/main_decoupled_unif.py --root [YOUR CUB200 DATA FOLDER] --save_dir [Y
 It comes with seven discrete attributes binarized into 126 binary attributes.
 
 ```bash
-python src/main_decoupled_unif.py --root [YOUR UTZAPPOS DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                                  --batch_size 256 --lr 0.3 \
-                                  --optimizer sgd --network resnet18 --db utzappos \
-                                  --kernel rbf --sigma 100 --weaklabels \
-                                  --multiprocessing-distributed
+python main_decoupled_unif.py --root [YOUR UTZAPPOS DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
+                              --batch_size 256 --lr 0.3 --epochs 1000 \
+                              --optimizer sgd --network resnet18 --db utzappos \
+                              --kernel rbf --sigma 100 --weaklabels \
+                              --multiprocessing-distributed
 ```
 
 #### CheXpert
@@ -130,10 +130,10 @@ python src/main_decoupled_unif.py --root [YOUR UTZAPPOS DATA FOLDER] --save_dir 
 To extract weak attributes using GloRIA, please read the above section. Then, you can run pre-training on CheXpert using:
 
 ```bash
-python src/main_decoupled_unif.py --root [YOUR CHEXPERT DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                                  --batch_size 256 --lr 0.3 \
-                                  --optimizer sgd --network resnet18 --db chexpert \
-                                  --kernel rbf --sigma 10 --weaklabels
+python main_decoupled_unif.py --root [YOUR CHEXPERT DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
+                              --batch_size 256 --lr 0.3 \
+                              --optimizer sgd --network resnet18 --db chexpert \
+                              --kernel rbf --sigma 10 --weaklabels
 ```
 
 ## Linear Evaluation
@@ -147,9 +147,9 @@ Data augmentation is applied during training of the linear layer.
 Use the following script to run linear evaluation on one of the previous dataset on a multi-gpu machine:
 
 ```bash
-python src/main_lincls.py --root [YOUR DATASET FOLDER] --save_dir [YOUR CHECKPOINT PATH] \
-                          --db [YOUR DATASET] --network [YOUR NETWORK] \
-                          --pretrained [YOUR CHECKPOINT PATH]/checkpoint_0399.pth.tar 
+python main_lincls.py --root [YOUR DATASET FOLDER] --save_dir [YOUR CHECKPOINT PATH] \
+                      --db [YOUR DATASET] --network [YOUR NETWORK] \
+                      --pretrained [YOUR CHECKPOINT PATH]/checkpoint_0399.pth.tar 
 ```
 
 By default, the above command uses batch size 512 and SGD optimizer with a `torch.optim.lr_scheduler.ReduceLROnPlateau` 

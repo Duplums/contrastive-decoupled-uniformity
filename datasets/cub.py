@@ -16,7 +16,7 @@ class CUB(ImageFolder, DatasetWithPrior):
     The training/test split follows the official one.
     """
     base_folder = 'CUB_200_2011/images'
-    url = 'http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz'
+    url = 'https://data.caltech.edu/records/65de6-vp158/files/CUB_200_2011.tgz'
     filename = 'CUB_200_2011.tgz'
     tgz_md5 = '97eceeb196236b17998738112f37df78'
 
@@ -52,10 +52,11 @@ class CUB(ImageFolder, DatasetWithPrior):
             Sets `attrs`, `imgs` and `samples` attributes
         """
         weaklabels = self.kwargs.pop("weaklabels", None)
+        root = self.root
         # Checks images repo and find all img paths
         super().__init__(os.path.join(self.root, self.base_folder),
                          self.transform, self.target_transform, **self.kwargs)
-
+        self.root = root
         # Defines training/test split from the official one
         train_test_split_pth = os.path.join(self.root, "CUB_200_2011", "train_test_split.txt")
         img_pth = os.path.join(self.root, "CUB_200_2011", "images.txt")
@@ -84,7 +85,8 @@ class CUB(ImageFolder, DatasetWithPrior):
     def _check_integrity(self):
         try:
             self._load_metadata()
-        except Exception:
+        except Exception as e:
+            print(e)
             return False
         return True
 
