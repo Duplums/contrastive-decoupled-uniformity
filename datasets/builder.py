@@ -89,7 +89,7 @@ def prepare_dataset(args) -> Dataset:
 
     if args.weaklabels:
         extra_kwargs["weaklabels"] = True
-    else:
-        dataset_cls = DATASETS[args.db]
+
+    dataset_cls = DATASETS[args.db]
 
     return dataset_cls(args.root, transform=transform, **extra_kwargs)
