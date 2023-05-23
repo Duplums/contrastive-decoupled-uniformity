@@ -22,7 +22,7 @@ DATASETS = dict(imagenet100=ImageNet100,
 
 
 def build_dataset_with_prior_constructor(self, *args, **kwargs):
-    super().__init__(*args, **kwargs)
+    super(self.__class__, self).__init__(*args, **kwargs)
     prior_path = self.prior_path
     if not os.path.isfile(prior_path):
         raise FileNotFoundError("Check %s" % prior_path)
@@ -43,7 +43,7 @@ def build_dataset_with_prior_constructor(self, *args, **kwargs):
 
 
 def build_dataset_with_prior_getitem(self, idx):
-    sample, _ = super().__getitem__(idx)
+    sample, _ = super(self.__class__, self).__getitem__(idx)
     target = self.prior[idx]
     return sample, target
 
