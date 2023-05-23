@@ -5,8 +5,9 @@ from torchvision.datasets.utils import download_url
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from datasets.prior import DatasetWithPrior
 
-class CUB(ImageFolder):
+class CUB(ImageFolder, DatasetWithPrior):
     """
     cf. Catherine Wah et al, The caltech-ucsd birds-200-2011 dataset, 2011
     200 bird categories with 11788 images.
@@ -18,7 +19,10 @@ class CUB(ImageFolder):
     url = 'http://www.vision.caltech.edu/visipedia-data/CUB-200-2011/CUB_200_2011.tgz'
     filename = 'CUB_200_2011.tgz'
     tgz_md5 = '97eceeb196236b17998738112f37df78'
-    prior_path = os.path.join(Path(__file__).parent.parent.resolve(), "data", "cub", "cub_prior.npz")
+
+    @property
+    def prior_path(self):
+        return os.path.join(Path(__file__).parent.parent.resolve(), "data", "cub", "cub_prior.npz")
 
     def __init__(self, root, transform=None, target_transform=None,
                  split="train", download=True, **kwargs):
@@ -47,6 +51,7 @@ class CUB(ImageFolder):
         """
             Sets `attrs`, `imgs` and `samples` attributes
         """
+        weaklabels = self.kwargs.pop("weaklabels", None)
         # Checks images repo and find all img paths
         super().__init__(os.path.join(self.root, self.base_folder),
                          self.transform, self.target_transform, **self.kwargs)
@@ -73,7 +78,8 @@ class CUB(ImageFolder):
         else:
             assert len(self) == 5794
 
-        self._build_prior()
+        if weaklabels is True:
+            self._build_prior()
 
     def _check_integrity(self):
         try:
@@ -108,3 +114,10 @@ class CUB(ImageFolder):
             attr = attr[attr_cols].to_numpy(dtype=np.float32)
             assert len(attr) == len(self)
             np.savez(os.path.splitext(self.prior_path)[0], prior=attr, labels=self.targets)
+        super()._build_prior()
+
+    def __getitem__(self, idx):
+        sample, label = super().__getitem__(idx)
+        if self.prior is not None:
+            label = self.prior[idx]
+        return sample, label

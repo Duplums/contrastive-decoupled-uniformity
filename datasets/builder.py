@@ -1,6 +1,6 @@
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset
-from typing import Type, Callable, Generic, TypeVar
+from typing import Callable
 from PIL import Image
 import torch
 import os
@@ -19,45 +19,6 @@ DATASETS = dict(imagenet100=ImageNet100,
                 cub200=CUB,
                 utzappos=UTZappos,
                 chexpert=CheXpert)
-
-
-def build_dataset_with_prior_constructor(self, *args, **kwargs):
-    super(self.__class__, self).__init__(*args, **kwargs)
-    prior_path = self.prior_path
-    if not os.path.isfile(prior_path):
-        raise FileNotFoundError("Check %s" % prior_path)
-    try:
-        pth_loaded = np.load(prior_path)
-        self.prior = pth_loaded["prior"]
-        true_labels = pth_loaded["labels"]
-    except Exception:
-        raise ValueError("Check numpy array: %s" % prior_path)
-    if len(self.prior.shape) == 3:
-        self.prior = self.prior[:, 0]
-    if len(true_labels.shape) == 3:
-        true_labels = true_labels[:, 0]
-    assert len(self.prior) == len(self), "Inconsistent # of samples"
-    if hasattr(self, "targets"):
-        assert np.all(true_labels.squeeze() == self.targets), "Inconsistent labels"
-    print("Weak labels loaded.", flush=True)
-
-
-def build_dataset_with_prior_getitem(self, idx):
-    sample, _ = super(self.__class__, self).__getitem__(idx)
-    target = self.prior[idx]
-    return sample, target
-
-
-# <class_name>WithPrior returns (sample, prior) instead of
-# (sample, label) with target class `label` of a given dataset.
-DATASETS_WITH_PRIOR = {cls_name:
-                           type("%sWithPrior" % cls.__name__, (cls,), {
-                               "__init__": build_dataset_with_prior_constructor,
-                               "__getitem__": build_dataset_with_prior_getitem
-                           })
-                       for (cls_name, cls) in DATASETS.items()
-                       }
-
 
 class NTransform:
     """Creates a pipeline that applies a transformation pipeline multiple times."""
@@ -127,7 +88,7 @@ def prepare_dataset(args) -> Dataset:
         extra_kwargs["download"] = True
 
     if args.weaklabels:
-        dataset_cls = DATASETS_WITH_PRIOR[args.db]
+        extra_kwargs["weaklabels"] = True
     else:
         dataset_cls = DATASETS[args.db]
 

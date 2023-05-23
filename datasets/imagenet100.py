@@ -1,14 +1,23 @@
 from torchvision.datasets import ImageNet
-
+from datasets.prior import DatasetWithPrior
 import os
 from pathlib import Path
 
-class ImageNet100(ImageNet):
+class ImageNet100(ImageNet, DatasetWithPrior):
     """
         100-classes subset of ImageNet introduced in [1]
         [1] Contrastive Multiview Coding, Tian, Krishnan, Isola, ECCV 2020
     """
-    prior_path = os.path.join(Path(__file__).parent.parent.resolve(), "data", "imagenet100", "imagenet100_prior.npz")
+
+    def __init__(self, *args, **kwargs):
+        weaklabels = kwargs.pop("weaklabels", None)
+        super().__init__(*args, **kwargs)
+        if weaklabels is True:
+            self._build_prior()
+
+    @property
+    def prior_path(self):
+        return os.path.join(Path(__file__).parent.parent.resolve(), "data", "imagenet100", "imagenet100_prior.npz")
 
     def _extract_classes(self, all_classes=None):
         """
@@ -52,3 +61,9 @@ class ImageNet100(ImageNet):
         classes.sort()
         class_to_idx = {cls_name: i for i, cls_name in enumerate(classes)}
         return classes, class_to_idx
+
+    def __getitem__(self, idx):
+        sample, label = super().__getitem__(idx)
+        if self.prior is not None:
+            label = self.prior[idx]
+        return sample, label

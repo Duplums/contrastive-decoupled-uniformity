@@ -5,8 +5,9 @@ from torchvision.datasets.utils import download_url
 import pandas as pd
 import numpy as np
 from pathlib import Path
+from datasets.prior import DatasetWithPrior
 
-class UTZappos(ImageFolder):
+class UTZappos(ImageFolder, DatasetWithPrior):
     """
     cf. Fine-Grained Visual Comparisons with Local Learning, A. Yu & K. Grauman, CVPR 2014
     7 auxiliary attributes with 50025 shoes images.
@@ -19,7 +20,10 @@ class UTZappos(ImageFolder):
     url_data = 'https://vision.cs.utexas.edu/projects/finegrained/utzap50k/ut-zap50k-data.zip'
     url_images = 'https://vision.cs.utexas.edu/projects/finegrained/utzap50k/ut-zap50k-images.zip'
     filenames = dict(data='ut-zap50k-data.zip', images='ut-zap50k-images.zip')
-    prior_path = os.path.join(Path(__file__).parent.parent.resolve(), "data", "utzappos", "utzappos_prior.npz")
+
+    @property
+    def prior_path(self):
+        return os.path.join(Path(__file__).parent.parent.resolve(), "data", "utzappos", "utzappos_prior.npz")
 
     _classes = ['Ankle', 'Athletic', 'Boat Shoes', 'Boot', 'Clogs and Mules',
                 'Crib Shoes', 'Firstwalker', 'Flat', 'Flats', 'Heel', 'Heels',
@@ -51,6 +55,7 @@ class UTZappos(ImageFolder):
                                ' You can use download=True to download it')
 
     def _load_metadata(self):
+        weaklabels = self.kwargs.pop("weaklabels", None)
         # Checks images repo and find all img paths
         super().__init__(os.path.join(self.root, "ut-zap50k-images"),
                          self.transform, self.target_transform, **self.kwargs)
@@ -92,7 +97,8 @@ class UTZappos(ImageFolder):
         else:
             assert len(self) == 15008
 
-        self._build_prior()
+        if weaklabels is True:
+            self._build_prior()
 
     def _check_integrity(self):
         try:
@@ -130,4 +136,4 @@ class UTZappos(ImageFolder):
             attr_cols = [i for i in train_attributes.columns if 'attr_val' in i]
             train_attributes = train_attributes[attr_cols].to_numpy(dtype=np.float32)
             np.savez(os.path.splitext(self.prior_path)[0], prior=train_attributes, labels=self.targets)
-
+        super()._build_prior()

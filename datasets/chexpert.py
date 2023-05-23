@@ -10,9 +10,10 @@ from typing import List
 import torch
 from torch.utils.data import Dataset, DataLoader, SequentialSampler
 from torchvision import transforms
+from datasets.prior import DatasetWithPrior
 from pathlib import Path
 
-class CheXpert(Dataset):
+class CheXpert(Dataset, DatasetWithPrior):
     """CheXpert Dataset (code adapted from https://github.com/mlmed/torchxrayvision)
     see "CheXpert: A Large Chest Radiograph Dataset with Uncertainty Labels and
     Expert Comparison", Irvin et al., AAAI 2019
@@ -26,11 +27,15 @@ class CheXpert(Dataset):
     PATHOLOGIES = ["Enlarged Cardiomediastinum", "Cardiomegaly", "Lung Opacity", "Lung Lesion",
                    "Edema", "Consolidation", "Pneumonia", "Atelectasis", "Pneumothorax", "Pleural Effusion",
                    "Pleural Other", "Fracture", "Support Devices"]
-    prior_path = os.path.join(Path(__file__).parent.parent.resolve(), "data", "chexpert", "chexpert_prior.npz")
+
+    @property
+    def prior_path(self):
+        return os.path.join(Path(__file__).parent.parent.resolve(), "data", "chexpert", "chexpert_prior.npz")
 
     def __init__(self, root: str, train: bool=True,
                  views: [str, List[str]]="*", labels: str="all",
-                 transform=None, target_transform=None):
+                 transform=None, target_transform=None,
+                 weaklabels: bool=False):
         """
         :param root: str, path to images folder
         :param train: bool
@@ -38,8 +43,11 @@ class CheXpert(Dataset):
         :param transform: callable, img transformation
         :param target_transform: callable
         """
-
         super(CheXpert, self).__init__()
+
+        if weaklabels is True:
+            self._build_prior()
+
         if isinstance(views, str): views = [views]
         assert set(views) <= {"PA", "AP", "*"}, "Unknown views: {}".format(views)
         if isinstance(labels, str): labels = [labels]
@@ -167,6 +175,8 @@ class CheXpert(Dataset):
     def __getitem__(self, idx):
         img = self.load_img(self.samples[idx])
         target = self.labels[idx]
+        if self.prior is not None:
+            target = self.prior[idx]
         if self.target_transform is not None:
             target = self.target_transform(target)
         if not self.return_labels:
