@@ -52,7 +52,7 @@ def build_transform_pipeline(args):
             transforms.RandomHorizontalFlip(),
             ColorDistortion(s=1),
             transforms.ToTensor(),
-            transforms.Normalize(*mean_std)
+            transforms.Normalize(*mean_std[args.db])
         ])
     else:
         tf["train"] = tf["val"]
