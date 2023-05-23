@@ -110,11 +110,11 @@ class UTZappos(ImageFolder, DatasetWithPrior):
 
     def _download(self):
         import zipfile
-
+        root = self.root
         if self._check_integrity():
             print('Files already downloaded and verified')
             return
-
+        self.root = root
         download_url(self.url_data, self.root, self.filenames['data'])
         download_url(self.url_images, self.root, self.filenames['images'])
 

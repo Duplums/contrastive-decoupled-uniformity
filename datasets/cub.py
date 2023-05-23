@@ -92,11 +92,11 @@ class CUB(ImageFolder, DatasetWithPrior):
 
     def _download(self):
         import tarfile
-
+        root = self.root
         if self._check_integrity():
             print('Files already downloaded and verified')
             return
-
+        self.root = root
         download_url(self.url, self.root, self.filename, self.tgz_md5)
 
         with tarfile.open(os.path.join(self.root, self.filename), "r:gz") as tar:
