@@ -335,7 +335,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     no gradient), which are part of the model parameters too.
     """
     model.eval()
-    losses = []
     for i, (images, target) in enumerate(train_loader):
 
         if args.gpu is not None:
@@ -345,7 +344,6 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
         # compute output
         output = model(images)
         loss = criterion(output, target)
-        losses.append(loss.detach().cpu().numpy())
         # measure accuracy and record loss
         acc1, acc5 = accuracy(output, target, topk=(1, 5))
         losses.update(loss.item(), images.size(0))
@@ -359,7 +357,7 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
 
         if i % args.print_freq == 0:
             progress.display(i)
-    return np.mean(losses)
+    return losses.avg
 
 def validate(val_loader, model, criterion, args):
     batch_time = AverageMeter('Time', ':6.3f')
