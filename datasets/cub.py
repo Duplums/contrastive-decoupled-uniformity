@@ -118,6 +118,6 @@ class CUB(ImageFolder, DatasetWithPrior):
 
     def __getitem__(self, idx):
         sample, label = super().__getitem__(idx)
-        if self.prior is not None:
+        if hasattr(self, "prior") and self.prior is not None:
             label = self.prior[idx]
         return sample, label

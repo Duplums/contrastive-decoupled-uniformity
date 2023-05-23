@@ -137,3 +137,9 @@ class UTZappos(ImageFolder, DatasetWithPrior):
             train_attributes = train_attributes[attr_cols].to_numpy(dtype=np.float32)
             np.savez(os.path.splitext(self.prior_path)[0], prior=train_attributes, labels=self.targets)
         super()._build_prior()
+
+    def __getitem__(self, idx):
+        sample, label = super().__getitem__(idx)
+        if hasattr(self, "prior") and self.prior is not None:
+            label = self.prior[idx]
+        return sample, label

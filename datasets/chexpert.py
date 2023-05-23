@@ -175,7 +175,7 @@ class CheXpert(Dataset, DatasetWithPrior):
     def __getitem__(self, idx):
         img = self.load_img(self.samples[idx])
         target = self.labels[idx]
-        if self.prior is not None:
+        if hasattr(self, "prior") and self.prior is not None:
             target = self.prior[idx]
         if self.target_transform is not None:
             target = self.target_transform(target)
