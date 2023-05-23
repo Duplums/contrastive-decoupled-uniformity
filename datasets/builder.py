@@ -1,6 +1,6 @@
 import torchvision.transforms as transforms
 from torch.utils.data import Dataset
-from typing import Type, Callable, List
+from typing import Type, Callable, Generic, TypeVar
 from PIL import Image
 import torch
 import os
@@ -12,20 +12,66 @@ from datasets.cub import CUB
 from datasets.utzappos import UTZappos
 # torchvision implementation of benchmarking datasets
 from torchvision.datasets import CIFAR10, CIFAR100
-global DatasetWithPrior
+
+DATASETS = dict(imagenet100=ImageNet100,
+                cifar10=CIFAR10,
+                cifar100=CIFAR100,
+                cub200=CUB,
+                utzappos=UTZappos,
+                chexpert=CheXpert)
+
+
+def build_dataset_with_prior_constructor(self, *args, **kwargs):
+    super().__init__(*args, **kwargs)
+    prior_path = self.prior_path
+    if not os.path.isfile(prior_path):
+        raise FileNotFoundError("Check %s" % prior_path)
+    try:
+        pth_loaded = np.load(prior_path)
+        self.prior = pth_loaded["prior"]
+        true_labels = pth_loaded["labels"]
+    except Exception:
+        raise ValueError("Check numpy array: %s" % prior_path)
+    if len(self.prior.shape) == 3:
+        self.prior = self.prior[:, 0]
+    if len(true_labels.shape) == 3:
+        true_labels = true_labels[:, 0]
+    assert len(self.prior) == len(self), "Inconsistent # of samples"
+    if hasattr(self, "targets"):
+        assert np.all(true_labels.squeeze() == self.targets), "Inconsistent labels"
+    print("Weak labels loaded.", flush=True)
+
+
+def build_dataset_with_prior_getitem(self, idx):
+    sample, _ = super().__getitem__(idx)
+    target = self.prior[idx]
+    return sample, target
+
+
+# <class_name>WithPrior returns (sample, prior) instead of
+# (sample, label) with target class `label` of a given dataset.
+DATASETS_WITH_PRIOR = {cls_name:
+                           type("%sWithPrior" % cls.__name__, (cls,), {
+                               "__init__": build_dataset_with_prior_constructor,
+                               "__getitem__": build_dataset_with_prior_getitem
+                           })
+                       for (cls_name, cls) in DATASETS.items()
+                       }
+
 
 class NTransform:
     """Creates a pipeline that applies a transformation pipeline multiple times."""
 
-    def __init__(self, base_transform: Callable, n_views: int=2):
+    def __init__(self, base_transform: Callable, n_views: int = 2):
         self.base_transform = base_transform
         self.n_views = n_views
 
     def __call__(self, x: Image) -> torch.Tensor:
         return torch.stack([self.base_transform(x) for _ in range(self.n_views)])
 
+
 class ColorDistortion:
-    def __init__(self, s: float=1.0):
+    def __init__(self, s: float = 1.0):
         # s is the strength of color distortion.
         color_jitter = transforms.ColorJitter(0.8 * s, 0.8 * s, 0.8 * s, 0.2 * s)
         rnd_color_jitter = transforms.RandomApply([color_jitter], p=0.8)
@@ -34,6 +80,7 @@ class ColorDistortion:
 
     def __call__(self, x):
         return self.color_distort(x)
+
 
 def build_transform_pipeline(args):
     mean_std = {
@@ -67,66 +114,21 @@ def build_transform_pipeline(args):
             transforms.Normalize(*mean_std[args.db])
         ]), args.n_views)
     else:
-        raise ValueError("Unknown dataset: %s"%args.db)
+        raise ValueError("Unknown dataset: %s" % args.db)
     return tf
-
-def dataset_with_prior(DatasetClass: Type[Dataset], prior_path: str) -> Type[Dataset]:
-    """ Factory dataset that returns (sample, prior) instead of
-        (sample, label) with target class `label`.
-    Args:
-        DatasetClass: Dataset class to be wrapped
-        prior_path: str, path to prior.npz
-    Returns:
-        Dataset returning prior as labels
-    """
-    class DatasetWithPrior(DatasetClass):
-        def __init__(self, *args, **kwargs):
-            super().__init__(*args, **kwargs)
-            if not os.path.isfile(prior_path):
-                raise FileNotFoundError("Check %s"%prior_path)
-            try:
-                pth_loaded = np.load(prior_path)
-                self.prior = pth_loaded["prior"]
-                true_labels = pth_loaded["labels"]
-            except Exception:
-                raise ValueError("Check numpy array: %s"%prior_path)
-            if len(self.prior.shape) == 3:
-                self.prior = self.prior[:, 0]
-            if len(true_labels.shape) == 3:
-                true_labels = true_labels[:, 0]
-            assert len(self.prior) == len(self), "Inconsistent # of samples"
-            if hasattr(self, "targets"):
-                assert np.all(true_labels.squeeze() == self.targets), "Inconsistent labels"
-            print("Weak labels loaded.", flush=True)
-
-        def __getitem__(self, idx):
-            sample, _ = super().__getitem__(idx)
-            target = self.prior[idx]
-            return sample, target
-    return DatasetWithPrior
 
 
 def prepare_dataset(args) -> Dataset:
     transform = build_transform_pipeline(args)
 
-    dataset2cls = dict(imagenet100=ImageNet100,
-                       cifar10=CIFAR10,
-                       cifar100=CIFAR100,
-                       cub200=CUB,
-                       utzappos=UTZappos,
-                       chexpert=CheXpert)
     extra_kwargs = {}
 
     if args.db in ["cifar10", "cifar100", "cub200", "utzappos"]:
         extra_kwargs["download"] = True
 
     if args.weaklabels:
-        prior_path = dataset2cls[args.db].prior_path
-        dataset_cls = dataset_with_prior(dataset2cls[args.db], prior_path)
+        dataset_cls = DATASETS_WITH_PRIOR[args.db]
     else:
-        dataset_cls = dataset2cls[args.db]
+        dataset_cls = DATASETS[args.db]
 
     return dataset_cls(args.root, transform=transform, **extra_kwargs)
-
-
-

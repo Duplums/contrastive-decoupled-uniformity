@@ -21,20 +21,18 @@ class DecoupledUniformity(nn.Module):
         super(DecoupledUniformity, self).__init__()
 
         # create the encoder
-        # num_classes is the output fc dimension, zero-initialize last BNs
-        self.encoder = base_encoder(num_classes=dim, zero_init_residual=True)
+        # num_classes is the output fc dimension
+        self.encoder = base_encoder(num_classes=dim)
 
         if not first_conv: # for small-scale images
             self.encoder.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
             self.encoder.maxpool = nn.Identity()
 
         # build a 2-layers projector
-        prev_dim = self.encoder.fc.weight.shape[1]
-        self.encoder.fc = nn.Sequential(
-                                    nn.ReLU(True),
-                                    nn.Linear(prev_dim, dim),
-                                    nn.ReLU(True),
-                                    nn.Linear(dim, proj_dim))
+        self.head = nn.Sequential(nn.ReLU(True),
+                                  nn.Linear(dim, dim),
+                                  nn.ReLU(True),
+                                  nn.Linear(dim, proj_dim))
 
     def forward(self, x):
         """
@@ -46,6 +44,7 @@ class DecoupledUniformity(nn.Module):
 
         # compute features for all images
         z = self.encoder(x)
+        z = self.head(z)
         return z
 
 
