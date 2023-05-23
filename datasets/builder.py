@@ -12,6 +12,7 @@ from datasets.cub import CUB
 from datasets.utzappos import UTZappos
 # torchvision implementation of benchmarking datasets
 from torchvision.datasets import CIFAR10, CIFAR100
+global DatasetWithPrior
 
 class NTransform:
     """Creates a pipeline that applies a transformation pipeline multiple times."""
@@ -70,7 +71,6 @@ def build_transform_pipeline(args):
     return tf
 
 def dataset_with_prior(DatasetClass: Type[Dataset], prior_path: str) -> Type[Dataset]:
-    global DatasetWithPrior
     """ Factory dataset that returns (sample, prior) instead of
         (sample, label) with target class `label`.
     Args:
