@@ -258,7 +258,9 @@ def train(train_loader, model, criterion, optimizer, epoch, args):
     for i, (images, prior) in enumerate(train_loader):
         if args.gpu is not None:
             images = images.cuda(args.gpu, non_blocking=True)
-
+            if prior is not None:
+                prior = prior.cuda(args.gpu, non_blocking=True)
+                
         # compute output and loss
         b_size, n_views = images.shape[:2]
         z = model(images.view(b_size * n_views, *images.shape[2:]))
