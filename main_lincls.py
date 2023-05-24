@@ -302,7 +302,7 @@ def main_worker(gpu, ngpus_per_node, args):
                                     batch_size=args.batch_size,
                                     num_workers=args.workers)
         acc1, acc5 = accuracy(torch.tensor(linear_model.predict_proba(X_test)),
-                                torch.tensor(y_test), topk=(1, 5))
+                              torch.tensor(y_test), topk=(1, 5))
         is_best = acc1 > best_acc1
         best_acc1 = max(acc1, best_acc1)
         print(' * Acc@1 {top1:.3f} Acc@5 {top5:.3f}'.format(top1=acc1[0], top5=acc5[0]))

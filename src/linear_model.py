@@ -143,6 +143,7 @@ class LinearClassifier(LinearEstimator, ClassifierMixin):
                 stopping_criterion = np.max(np.abs(np.mean(losses[-patience:]) - losses[-patience:]))
                 if stopping_criterion < self.tol: # early-stopping
                     break
+        print("Accuracy: %.3f" % acc, flush=True)
         losses = np.array(losses)
         if (np.max(np.abs(np.mean(losses[-patience:]) - losses[-patience:])) > self.tol):
             print("Warning: max iter reached before clear convergence", flush=True)
