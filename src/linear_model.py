@@ -5,6 +5,7 @@ from sklearn.utils.validation import check_X_y, check_is_fitted
 from sklearn.metrics import accuracy_score
 from sklearn.utils.multiclass import unique_labels
 from sklearn.model_selection import GridSearchCV
+from sklearn.linear_model import LogisticRegression
 from torch.utils.data.dataset import Dataset
 from torch.utils.data.dataloader import DataLoader
 import torch.nn as nn
@@ -24,8 +25,12 @@ def encode_dataset(loader: DataLoader, model: nn.Module, gpu: int=0) -> [np.ndar
 def train_linear(X_train, y_train, cv=3,
                  scoring="balanced_accuracy",
                  batch_size=512, num_workers=10):
-    model = LinearClassifier(batch_size=batch_size, lr=0.1, epochs=300)
-    param_grid = {"weight_decay": [0, 1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6]}
+    if len(X_train) < 2e4:
+        model = LogisticRegression(solver="saga", max_iter=150)
+        param_grid = {"C": [1e-1, 1, 1e1, 1e2, 1e3, 1e4, 1e5, 1e6]}
+    else:
+        model = LinearClassifier(batch_size=batch_size, lr=0.1, epochs=300)
+        param_grid = {"weight_decay": [0, 1, 1e-1, 1e-2, 1e-3, 1e-4, 1e-5, 1e-6]}
     model = GridSearchCV(model, cv=cv, param_grid=param_grid,
                          scoring=scoring, n_jobs=num_workers)
     model.fit(X_train, y_train)
