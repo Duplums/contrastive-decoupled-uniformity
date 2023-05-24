@@ -45,9 +45,6 @@ class CheXpert(Dataset, DatasetWithPrior):
         """
         super(CheXpert, self).__init__()
 
-        if weaklabels is True:
-            self._build_prior()
-
         if isinstance(views, str): views = [views]
         assert set(views) <= {"PA", "AP", "*"}, "Unknown views: {}".format(views)
         if isinstance(labels, str): labels = [labels]
@@ -64,12 +61,14 @@ class CheXpert(Dataset, DatasetWithPrior):
         self.views = views
         self.split = "train" if train else "valid"
         self._load_metadata()
+        if weaklabels is True:
+            self._build_prior()
 
     def _load_metadata(self):
         self.csvpath = os.path.join(self.root, self.split+".csv")
         self.check_paths_exist()
         self.csv = pd.read_csv(self.csvpath)
-        self.samples = self.csv.Path.map(lambda p: os.path.join(self.root, p.replace("CheXpert-v1.0-small/",""))).values
+        self.samples = self.csv.Path.map(lambda p: os.path.join(self.root, p.replace("CheXpert-v1.0-small/", ""))).values
         # Assign view column
         self.csv["view"] = self.csv["Frontal/Lateral"]
         # If Frontal change with the corresponding value in the AP/PA column otherwise remains Lateral

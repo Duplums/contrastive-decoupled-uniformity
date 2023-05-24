@@ -39,7 +39,7 @@ To reproduce our results on CIFAR10/CIFAR100 on a single-gpu machine, try the fo
 
 ```bash
 python main_decoupled_unif.py --root [YOUR CIFAR10/100 DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                              --batch_size 256 --lr 0.3 \
+                              --batch_size 256 --lr 0.3 --epochs 400 \
                               --optimizer sgd --network resnet18 --db cifar10 \
                               --gpu 0
 ```
@@ -53,7 +53,7 @@ For bigger-scale training (e.g. ImageNet100) using ResNet50 backbone, 4-gpu mach
 
 ```bash
 python main_decoupled_unif.py --root [YOUR IMAGENET DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                              --batch_size 256 --lr 0.3 \
+                              --batch_size 256 --lr 0.3 --epochs 400 \
                               --optimizer lars --wd 1e-6 --network resnet50 \
                               --db imagenet100 --multiprocessing-distributed
 ```
@@ -91,7 +91,7 @@ After having generated BigBiGAN features, use the following script to pre-train 
 
 ```bash
 python main_decoupled_unif.py --root [YOUR IMAGENET DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                              --batch_size 256 --lr 0.3 \
+                              --batch_size 256 --lr 0.3 --epochs 400 \
                               --optimizer lars --wd 1e-6 --network resnet50 \
                               --db imagenet100 --kernel rbf --sigma 100 --weaklabels \
                               --multiprocessing-distributed
@@ -131,9 +131,10 @@ To extract weak attributes using GloRIA, please read the above section. Then, yo
 
 ```bash
 python main_decoupled_unif.py --root [YOUR CHEXPERT DATA FOLDER] --save_dir [YOUR CHECKPOINT PATH] \ 
-                              --batch_size 256 --lr 0.3 \
-                              --optimizer sgd --network resnet18 --db chexpert \
-                              --kernel rbf --sigma 10 --weaklabels
+                              --batch_size 1024 --lr 0.5 --epochs 400 \
+                              --optimizer lars --wd 1e-6 --network resnet18 --db chexpert \
+                              --kernel rbf --sigma 10 --weaklabels \
+                              --multiprocessing-distributed
 ```
 
 ## Linear Evaluation
