@@ -51,11 +51,12 @@ class CUB(ImageFolder, DatasetWithPrior):
         """
             Sets `attrs`, `imgs` and `samples` attributes
         """
-        weaklabels = self.kwargs.pop("weaklabels", None)
+        kwargs = self.kwargs.copy()
+        weaklabels = kwargs.pop("weaklabels", None)
         root = self.root
-        # Checks images repo and find all img paths
+        # Checks images repo and find all img paths (modifies self.root internally)
         super().__init__(os.path.join(self.root, self.base_folder),
-                         self.transform, self.target_transform, **self.kwargs)
+                         self.transform, self.target_transform, **kwargs)
         self.root = root
         # Defines training/test split from the official one
         train_test_split_pth = os.path.join(self.root, "CUB_200_2011", "train_test_split.txt")

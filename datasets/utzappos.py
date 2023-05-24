@@ -55,11 +55,12 @@ class UTZappos(ImageFolder, DatasetWithPrior):
                                ' You can use download=True to download it')
 
     def _load_metadata(self):
-        weaklabels = self.kwargs.pop("weaklabels", None)
-        # Checks images repo and find all img paths
+        kwargs = self.kwargs.copy()
+        weaklabels = kwargs.pop("weaklabels", None)
         root = self.root
+        # Checks images repo and find all img paths (modifies self.root internally)
         super().__init__(os.path.join(self.root, "ut-zap50k-images"),
-                         self.transform, self.target_transform, **self.kwargs)
+                         self.transform, self.target_transform, **kwargs)
         self.root = root
         # Get training split defined in [1]
         attr_path = os.path.join(os.path.dirname(self.prior_path), "meta_data_bin_train.csv")
