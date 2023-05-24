@@ -104,7 +104,8 @@ class UTZappos(ImageFolder, DatasetWithPrior):
     def _check_integrity(self):
         try:
             self._load_metadata()
-        except Exception:
+        except Exception as e:
+            print(e)
             return False
         return True
 

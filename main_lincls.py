@@ -118,7 +118,7 @@ def main_worker(gpu, ngpus_per_node, args):
 
     # suppress printing if not master
     if args.multiprocessing_distributed and args.gpu != 0:
-        def print_pass(*args):
+        def print_pass(*args, **kwargs):
             pass
         builtins.print = print_pass
 
