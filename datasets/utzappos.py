@@ -130,7 +130,7 @@ class UTZappos(ImageFolder, DatasetWithPrior):
                 raise FileNotFoundError("Corrupted repo, missing file: %s"%attr_path)
             train_attributes = pd.read_csv(attr_path, sep=",")
             extract_cid = lambda p: os.path.basename(p).replace(".jpg", "").replace(".", "-")
-            train_cid= train_attributes["path"].apply(extract_cid)
+            train_attributes["CID"] = train_attributes["path"].apply(extract_cid)
             imgs_df = pd.DataFrame(self.samples, columns=["path", "class"])
             imgs_df["CID"] = imgs_df.path.apply(extract_cid)
             train_attributes = pd.merge(imgs_df, train_attributes, on=["CID"], how="left", sort=False,
