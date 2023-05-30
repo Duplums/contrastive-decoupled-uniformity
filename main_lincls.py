@@ -176,7 +176,7 @@ def main_worker(gpu, ngpus_per_node, args):
     # infer learning rate before changing batch size
     init_lr = args.lr * args.batch_size / 256
 
-    if args.distributed:
+    if args.distributed and args.db == "imagenet100":
         # For multiprocessing distributed, DistributedDataParallel constructor
         # should always set the single device scope, otherwise,
         # DistributedDataParallel will use all available devices.
@@ -199,11 +199,7 @@ def main_worker(gpu, ngpus_per_node, args):
         model = model.cuda(args.gpu)
     else:
         # DataParallel will divide and allocate batch_size to all available GPUs
-        if args.network.startswith('alexnet') or args.network.startswith('vgg'):
-            model.features = torch.nn.DataParallel(model.features)
-            model.cuda()
-        else:
-            model = torch.nn.DataParallel(model).cuda()
+        model = torch.nn.DataParallel(model).cuda()
 
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda(args.gpu)
@@ -425,7 +421,7 @@ def sanity_check(state_dict, pretrained_weights):
 
         # name in pretrained model
         k_pre = 'encoder.' + k
-        
+
         assert ((state_dict[k].cpu() == state_dict_pre[k_pre]).all()), \
             '{} is changed in linear classifier training.'.format(k)
 
