@@ -414,7 +414,7 @@ def sanity_check(state_dict, pretrained_weights):
     checkpoint = torch.load(pretrained_weights, map_location="cpu")
     state_dict_pre = checkpoint['state_dict']
     # rename all keys
-    for k, v in state_dict_pre.items():
+    for (k, v) in list(state_dict_pre.items()):
         new_k = re.sub(r"(encoder.|module.encoder.)", "", k)
         state_dict_pre[new_k] = v
 
