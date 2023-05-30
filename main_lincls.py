@@ -143,13 +143,8 @@ def main_worker(gpu, ngpus_per_node, args):
         model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
         model.maxpool = nn.Identity()
 
-    # freeze all layers but the last fc
     for name, param in model.named_parameters():
-        if name not in ['fc.weight', 'fc.bias']:
-            param.requires_grad = False
-    # init the fc layer
-    model.fc.weight.data.normal_(mean=0.0, std=0.01)
-    model.fc.bias.data.zero_()
+        param.requires_grad = False
 
     # load from pre-trained, before DistributedDataParallel constructor
     if args.pretrained:
@@ -160,20 +155,25 @@ def main_worker(gpu, ngpus_per_node, args):
             # rename pre-trained keys
             state_dict = checkpoint['state_dict']
             for k in list(state_dict.keys()):
-                # retain only encoder up to before the embedding layer
                 new_k = re.sub(r"(module.encoder.|encoder.)", "", k)
-                if not new_k.startswith("fc"):
-                    state_dict[new_k] = state_dict[k]
-                    # delete renamed or unused k
-                    del state_dict[k]
+                state_dict[new_k] = state_dict[k]
+                # delete renamed or unused k
+                del state_dict[k]
 
             args.start_epoch = 0
             msg = model.load_state_dict(state_dict, strict=False)
-            assert set(msg.missing_keys) == {"fc.weight", "fc.bias"}
+            assert set(msg.missing_keys) == {}
 
             print("=> loaded pre-trained model '{}'".format(args.pretrained))
         else:
             print("=> no checkpoint found at '{}'".format(args.pretrained))
+
+    # Add linear head for SGD training
+    if args.db == "imagenet100":
+        num_classes = 100
+        model.fc = nn.Sequential(model.fc, nn.Linear(model.fc.out_features, num_classes))
+
+    print(model)
 
     # infer learning rate before changing batch size
     init_lr = args.lr * args.batch_size / 256
