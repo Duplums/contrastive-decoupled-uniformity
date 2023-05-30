@@ -13,6 +13,7 @@ import numpy as np
 
 def encode_dataset(loader: DataLoader, model: nn.Module, gpu: int=0) -> [np.ndarray, np.ndarray]:
     X, y = [], []
+    model.eval()
     for images, target in loader:
         if gpu is not None:
             images = images.cuda(gpu, non_blocking=True)
