@@ -420,7 +420,7 @@ def sanity_check(state_dict, pretrained_weights):
 
     for k in list(state_dict.keys()):
         # only ignore fc layer
-        if 'fc.weight' in k or 'fc.bias' in k:
+        if 'fc.' in k or 'fc.' in k:
             continue
         # rename pretrained model
         new_k = re.sub(r"(module.|module.encoder.|encoder.)", "", k)
