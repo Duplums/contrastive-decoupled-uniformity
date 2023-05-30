@@ -415,7 +415,7 @@ def sanity_check(state_dict, pretrained_weights):
     state_dict_pre = checkpoint['state_dict']
     # rename all keys
     for (k, v) in list(state_dict_pre.items()):
-        new_k = re.sub(r"(encoder.|module.encoder.)", "", k)
+        new_k = re.sub(r"(module.|module.encoder.|encoder.)", "", k)
         state_dict_pre[new_k] = v
 
     for k in list(state_dict.keys()):
@@ -423,7 +423,7 @@ def sanity_check(state_dict, pretrained_weights):
         if 'fc.weight' in k or 'fc.bias' in k:
             continue
         # rename pretrained model
-        new_k = re.sub(r"(encoder.|module.encoder.)", "", k)
+        new_k = re.sub(r"(module.|module.encoder.|encoder.)", "", k)
         state_dict[new_k] = state_dict[k]
 
         assert ((state_dict[new_k].cpu() == state_dict_pre[new_k]).all()), \
