@@ -204,15 +204,14 @@ def main_worker(gpu, ngpus_per_node, args):
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda(args.gpu)
 
-    parameters = list(filter(lambda p: p.requires_grad, model.parameters()))
 
     if args.db == "imagenet100":
         # optimize only the linear classifier
+        parameters = list(filter(lambda p: p.requires_grad, model.parameters()))
         assert len(parameters) == 2  # fc.weight, fc.bias
-
-    optimizer = torch.optim.SGD(parameters, init_lr,
-                                momentum=args.momentum,
-                                weight_decay=args.weight_decay)
+        optimizer = torch.optim.SGD(parameters, init_lr,
+                                    momentum=args.momentum,
+                                    weight_decay=args.weight_decay)
 
     # optionally resume from a checkpoint
     if args.resume:
@@ -230,7 +229,8 @@ def main_worker(gpu, ngpus_per_node, args):
                 # best_acc1 may be from a checkpoint from a different GPU
                 best_acc1 = best_acc1.to(args.gpu)
             model.load_state_dict(checkpoint['state_dict'])
-            optimizer.load_state_dict(checkpoint['optimizer'])
+            if args.db == "imagenet100":
+                optimizer.load_state_dict(checkpoint['optimizer'])
             print("=> loaded checkpoint '{}' (epoch {})"
                   .format(args.resume, checkpoint['epoch']))
         else:
@@ -284,7 +284,7 @@ def main_worker(gpu, ngpus_per_node, args):
                     'arch': args.network,
                     'state_dict': model.state_dict(),
                     'best_acc1': best_acc1,
-                    'optimizer' : optimizer.state_dict()},
+                    'optimizer': optimizer.state_dict()},
                     is_best,
                     filename=os.path.join(args.save_dir, 'checkpoint.pth.tar'))
                 if epoch == args.start_epoch:
