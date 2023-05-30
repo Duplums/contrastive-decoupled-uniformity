@@ -22,7 +22,7 @@ class DecoupledUniformity(nn.Module):
 
         # create the encoder
         # num_classes is the output fc dimension
-        self.encoder = base_encoder(num_classes=dim)
+        self.encoder = base_encoder(num_classes=dim, pretrained=False)
 
         if not first_conv: # for small-scale images
             self.encoder.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)

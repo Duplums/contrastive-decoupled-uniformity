@@ -137,7 +137,7 @@ def main_worker(gpu, ngpus_per_node, args):
         torch.distributed.barrier()
     # create model
     print("=> creating model '{}'".format(args.network))
-    model = models.__dict__[args.network](num_classes=2048)
+    model = models.__dict__[args.network](num_classes=2048, pretrained=False)
     # replace first conv for small-scale images
     if args.db in ["cifar10", "cifar100", "utzappos"]:
         model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
@@ -161,9 +161,7 @@ def main_worker(gpu, ngpus_per_node, args):
                 del state_dict[k]
 
             args.start_epoch = 0
-            msg = model.load_state_dict(state_dict, strict=False)
-            assert set(msg.missing_keys) == {}
-
+            model.load_state_dict(state_dict, strict=True)
             print("=> loaded pre-trained model '{}'".format(args.pretrained))
         else:
             print("=> no checkpoint found at '{}'".format(args.pretrained))
@@ -210,9 +208,11 @@ def main_worker(gpu, ngpus_per_node, args):
     # define loss function (criterion) and optimizer
     criterion = nn.CrossEntropyLoss().cuda(args.gpu)
 
-    # optimize only the linear classifier
     parameters = list(filter(lambda p: p.requires_grad, model.parameters()))
-    assert len(parameters) == 2  # fc.weight, fc.bias
+
+    if args.db == "imagenet100":
+        # optimize only the linear classifier
+        assert len(parameters) == 2  # fc.weight, fc.bias
 
     optimizer = torch.optim.SGD(parameters, init_lr,
                                 momentum=args.momentum,
@@ -312,8 +312,8 @@ def main_worker(gpu, ngpus_per_node, args):
                 'epoch': args.epochs,
                 'arch': args.network,
                 'state_dict': model.state_dict(),
-                'best_acc1': best_acc1,
-                'optimizer': optimizer.state_dict()},
+                'best_acc1': best_acc1
+                },
                 is_best,
                 filename=os.path.join(args.save_dir, 'checkpoint.pth.tar'))
 
@@ -424,9 +424,8 @@ def sanity_check(state_dict, pretrained_weights):
             continue
 
         # name in pretrained model
-        k_pre = 'module.encoder.' + k[len('module.'):] \
-            if k.startswith('module.') else 'module.encoder.' + k
-
+        k_pre = 'encoder.' + k
+        
         assert ((state_dict[k].cpu() == state_dict_pre[k_pre]).all()), \
             '{} is changed in linear classifier training.'.format(k)
 
