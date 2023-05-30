@@ -137,7 +137,7 @@ def main_worker(gpu, ngpus_per_node, args):
         torch.distributed.barrier()
     # create model
     print("=> creating model '{}'".format(args.network))
-    model = models.__dict__[args.network]()
+    model = models.__dict__[args.network](num_classes=2048)
     # replace first conv for small-scale images
     if args.db in ["cifar10", "cifar100", "utzappos"]:
         model.conv1 = nn.Conv2d(3, 64, kernel_size=3, stride=1, padding=2, bias=False)
